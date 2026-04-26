@@ -13,15 +13,14 @@ pipeline {
             }
         }
 
-        stage('Clone repo') {
+          stage('clone reposiotry') {
             steps {
-               git branch: 'main', url: 'https://github.com/hellokaton/java11-examples.git'
+           git 'https://github.com/hellokaton/java11-examples.git'
             }
         }
-
-        stage('Create Package') {
+        stage('creating package') {
             steps {
-               sh 'mvn clean package'
+           sh 'mvn clean package'
             }
         }
     }
