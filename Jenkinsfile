@@ -42,5 +42,12 @@ sh 'sudo chmod +x /opt/sonar-scanner/bin/sonar-scanner'
 sh '. /etc/profile.d/sonar-scanner.sh'
 }
 }
+
+        stage('Analyzing Code Quality') {
+steps {
+// Step to analyze code quality with SonarQube
+sh '/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=upgradmanualorg_analyseprojectnewupgrad -Dsonar.organization=upgradmanualorg -Dsonar.qualitygate.wait=false -Dsonar.qualitygate.timeout=300 -Dsonar.sources=src/main/java/ -Dsonar.java.binaries=target/classes -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=25b3818a8f8299ea69f6d724526b1dbb00c7de87'
+}
+}
     }
 }
