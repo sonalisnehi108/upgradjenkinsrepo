@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Install maven') {
+        stage('Install  maven') {
             steps {
                sh 'sudo apt  install maven -y'
             }
