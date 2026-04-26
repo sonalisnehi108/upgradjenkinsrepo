@@ -1,20 +1,21 @@
-
 pipeline {
     agent any
+
     stages {
-        stage('build') {
+        stage('Install maven') {
             steps {
-                echo 'build'
+               sh 'sudo apt  install maven -y'
             }
         }
-          stage('test') {
+         stage('Install jdk') {
             steps {
-                echo 'test'
+               sh 'sudo apt install openjdk-21-jdk  -y'
             }
         }
-         stage('deploy') {
+
+        stage('Clone repo') {
             steps {
-                echo 'deploy'
+               git branch: 'main', url: 'https://github.com/hellokaton/java11-examples.git'
             }
         }
     }
