@@ -17,15 +17,10 @@ pipeline {
 		stage('docker login') {
             steps {
                sh '''echo "dckr_pat_64hl2yp85cekPa68faMQ9o2M5ek" |docker login -u sonalisnehi --password-stdin
-'''
+				 	sudo docker push sonalisnehi/javatest'''
             }
         }
 
-		stage('docker push') {
-            steps {
-               sh '''sudo docker push sonalisnehi/javatest'''
-            }
-        }
-
+		
     }
 }
