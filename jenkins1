@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('clone') {
+            steps {
+               git 'https://github.com/sonalisnehi108/javadocker.git'
+            }
+        }
+	  stage('build') {
+            steps {
+               sh '''sudo docker build -t sonalisnehi/javaimage -f dockerfile .
+'''
+            }
+        }
+
+    }
+}
