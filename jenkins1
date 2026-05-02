@@ -9,7 +9,7 @@ pipeline {
         }
 	  stage('build') {
             steps {
-               sh '''sudo docker build -t amitow/javatest -f dockerfile .
+               sh '''sudo docker build -t sonalisnehi/javatest -f dockerfile .
 '''
             }
         }
@@ -23,7 +23,7 @@ pipeline {
 
 		stage('docker push') {
             steps {
-               sh '''sudo docker push amitow/javatest:latest'''
+               sh '''sudo docker push sonalisnehi/javatest:latest'''
             }
         }
 
