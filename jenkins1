@@ -4,12 +4,12 @@ pipeline {
     stages {
         stage('clone') {
             steps {
-               git 'https://github.com/sonalisnehi108/javadocker.git'
+               git 'https://github.com/openwriteup/java11-jenkins.git'
             }
         }
 	  stage('build') {
             steps {
-               sh '''sudo docker build -t sonalisnehi/javaimage -f dockerfile .
+               sh '''sudo docker build -t amitow/javatest -f dockerfile .
 '''
             }
         }
