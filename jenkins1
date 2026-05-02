@@ -23,7 +23,7 @@ pipeline {
 
 		stage('docker push') {
             steps {
-               sh '''sudo docker push sonalisnehi/javaimage
+               sh '''sudo docker push amitow/javatest
 '''
             }
         }
