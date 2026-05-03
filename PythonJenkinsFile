@@ -12,7 +12,7 @@ pipeline {
 
 stage('build') {
             steps {
-               sh '''sudo docker build -t sonalisnehi/pyproject1 -f dockerfile .
+               sh '''sudo docker build -t sonalisnehi/pyproject1 -f Dockerfile .
 '''
             }
         }
