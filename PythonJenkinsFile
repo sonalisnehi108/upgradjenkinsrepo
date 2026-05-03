@@ -58,5 +58,43 @@ pipeline {
                 }
             }
         }
+
+
+
+stage('install trivy') {
+            steps {
+               sh '''sudo apt-get install wget gnupg
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+sudo apt-get update
+sudo apt-get install trivy'''
+            }
+        }
+
+stage('trivy scan') {
+            steps {
+               sh '''trivy image sonalisnehi/pyproject1'''
+            }
+        }
+
+
+stage(' see dashboard scan') {
+            steps {
+            sh ' trivy image --format json --output result.json --severity HIGH,CRITICAL sonalisnehi/pyproject1'
+				archiveArtifacts artifacts: 'result.json', followSymlinks: false
+            }
+        }
+
+
+stage('Mailing') {
+            steps {
+               mail bcc: '', body: 'Echo status', cc: '', from: 'sonali.friendly@gmail.com', replyTo: '', subject: 'Echo JobStatus of Trivy by jenkins', to: 'sonali.friendly@gmail.com'
+            }
+        }
+    }
+}
+
+
+
     }
 }
