@@ -40,6 +40,14 @@ stage('trivy scan') {
         }
 
 
+stage(' see dashboard scan') {
+            steps {
+            sh ' trivy image --format json --output result.json severity HIGH,CRITICAL sonalisnehi/javatest'
+				archiveArtifacts artifacts: 'result.json', followSymlinks: false
+            }
+        }
+
+
 stage('Mailing') {
             steps {
                mail bcc: '', body: 'Echo status', cc: '', from: 'sonali.friendly@gmail.com', replyTo: '', subject: 'Echo JobStatus of Trivy by jenkins', to: 'sonali.friendly@gmail.com'
