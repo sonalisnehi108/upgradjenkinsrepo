@@ -22,6 +22,14 @@ pipeline {
             }
         }
 
+
+stages {
+        stage('Slack Test') {
+            steps {
+                slackSend(message: "🔔 Test message from Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'sudo docker build -t sonalisnehi/pyproject1 -f Dockerfile .'
