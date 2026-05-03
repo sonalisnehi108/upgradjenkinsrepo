@@ -1,32 +1,33 @@
 pipeline {
     agent any
 
+    environment {
+        SONAR_SCANNER = "/opt/sonar-scanner/bin/sonar-scanner"
+    }
+
     stages {
-        stage('clone') {
+        stage('Clone') {
             steps {
                 git branch: 'main', url: 'https://github.com/sonalisnehi108/cicdproject.git'
             }
         }
 
-
-
-stage('build') {
+        stage('Build') {
             steps {
-               sh '''sudo docker build -t sonalisnehi/pyproject1 -f Dockerfile .
-'''
+                sh 'sudo docker build -t sonalisnehi/pyproject1 -f Dockerfile .'
             }
         }
 
-		stage('docker login and puh image') {
+        stage('Docker Login & Push Image') {
             steps {
-					withCredentials([usernamePassword(credentialsId: 'mytoken', passwordVariable: 'password', usernameVariable: 'username')]) {
-               sh '''echo $password |docker login -u $username --password-stdin
-				 	  docker push sonalisnehi/pyproject1'''
-			}
+                withCredentials([usernamePassword(credentialsId: 'mytoken', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh '''
+                        echo $password | docker login -u $username --password-stdin
+                        docker push sonalisnehi/pyproject1
+                    '''
+                }
             }
         }
-
-
 
         stage('Install SonarQube CLI') {
             steps {
@@ -41,23 +42,21 @@ stage('build') {
             }
         }
 
-stage('Analyze Code Quality') {
-    steps {
-        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-            sh '''
-                $SONAR_SCANNER \
-                  -Dsonar.projectKey=upgradmanualorg_masterclassproject \
-                  -Dsonar.organization=upgradmanualorg \
-                  -Dsonar.qualitygate.wait=false \
-                  -Dsonar.qualitygate.timeout=300 \
-                  -Dsonar.sources=. \
-                  -Dsonar.host.url=https://sonarcloud.io \
-                  -Dsonar.login=$SONAR_TOKEN
-            '''
+        stage('Analyze Code Quality') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        $SONAR_SCANNER \
+                          -Dsonar.projectKey=upgradmanualorg_masterclassproject \
+                          -Dsonar.organization=upgradmanualorg \
+                          -Dsonar.qualitygate.wait=false \
+                          -Dsonar.qualitygate.timeout=300 \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=https://sonarcloud.io \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
+            }
         }
-    }
-
-
-
     }
 }
