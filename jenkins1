@@ -16,8 +16,10 @@ pipeline {
 
 		stage('docker login and puh image') {
             steps {
-               sh '''echo "dckr_pat_JnRLs615Q4dIpgjXsq_k76oFR5U" |docker login -u sonalisnehi --password-stdin
+					withCredentials([usernamePassword(credentialsId: 'mytoken', passwordVariable: 'password', usernameVariable: 'username')]) {
+               sh '''echo $password |docker login -u $username --password-stdin
 				 	  docker push sonalisnehi/javatest'''
+			}
             }
         }
 
