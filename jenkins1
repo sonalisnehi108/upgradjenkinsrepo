@@ -33,7 +33,7 @@ sudo apt-get install trivy'''
 
 stage('trivy scan') {
             steps {
-               sh '''trivi image sonalisnehi/javatest'''
+               sh '''trivy image sonalisnehi/javatest'''
             }
         }
 		
