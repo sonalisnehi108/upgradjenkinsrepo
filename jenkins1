@@ -38,6 +38,12 @@ stage('trivy scan') {
                sh '''trivy image sonalisnehi/javatest'''
             }
         }
-		
+
+
+stage('Mailing') {
+            steps {
+               mail bcc: '', body: 'Echo status', cc: '', from: 'sonali.friendly@gmail.com', replyTo: '', subject: 'Echo JobStatus of Trivy by jenkins', to: 'sonali.friendly@gmail.com'
+            }
+        }
     }
 }
