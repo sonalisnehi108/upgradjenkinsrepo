@@ -37,13 +37,25 @@ stage('build') {
                     unzip -o -q sonar-scanner.zip
                     sudo rm -rf /opt/sonar-scanner
                     sudo mv --force sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
-                    echo "export PATH=$PATH:/opt/sonar-scanner/bin" | sudo tee /etc/profile.d/sonar-scanner.sh
-                    source /etc/profile.d/sonar-scanner.sh
                 '''
             }
         }
 
-
+stage('Analyze Code Quality') {
+    steps {
+        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+            sh '''
+                $SONAR_SCANNER \
+                  -Dsonar.projectKey=upgradmanualorg_masterclassproject \
+                  -Dsonar.organization=upgradmanualorg \
+                  -Dsonar.qualitygate.wait=false \
+                  -Dsonar.qualitygate.timeout=300 \
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=https://sonarcloud.io \
+                  -Dsonar.login=$SONAR_TOKEN
+            '''
+        }
+    }
 
 
 
