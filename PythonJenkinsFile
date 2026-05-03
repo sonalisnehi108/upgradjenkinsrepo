@@ -10,6 +10,21 @@ pipeline {
 
 
 
+stage('build') {
+            steps {
+               sh '''sudo docker build -t sonalisnehi/pyproject1 -f dockerfile .
+'''
+            }
+        }
+
+		stage('docker login and puh image') {
+            steps {
+					withCredentials([usernamePassword(credentialsId: 'mytoken', passwordVariable: 'password', usernameVariable: 'username')]) {
+               sh '''echo $password |docker login -u $username --password-stdin
+				 	  docker push sonalisnehi/pyproject1'''
+			}
+            }
+        }
 
 
     }
