@@ -9,7 +9,7 @@ pipeline {
         stage('Clone') {
             steps {
                 git branch: 'main', url: 'https://github.com/sonalisnehi108/cicdproject.git'
-            
+            }
             post {
                 success {
                     slackSend(channel: '#cicd-alerts', color: '#36a64f',
@@ -19,7 +19,7 @@ pipeline {
                     slackSend(channel: '#cicd-alerts', color: '#FF0000',
                         message: "❌ Clone failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
                 }
-                }
+                
             }
         }
 
