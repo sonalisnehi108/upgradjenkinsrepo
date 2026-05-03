@@ -23,7 +23,7 @@ pipeline {
         }
 
 
-stages {
+
         stage('Slack Test') {
             steps {
                 slackSend(message: "🔔 Test message from Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER}")
