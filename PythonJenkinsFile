@@ -1,11 +1,14 @@
 pipeline {
     agent any
 
-   stage('clone') {
-    steps {
-        git branch: 'main', url: 'https://github.com/sonalisnehi108/cicdproject.git'
-    }
-}
+    stages {
+        stage('clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sonalisnehi108/cicdproject.git'
+            }
+        }
+
+
 
 
 
