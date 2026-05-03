@@ -10,11 +10,31 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/sonalisnehi108/cicdproject.git'
             }
+            post {
+                success {
+                    slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                        message: "✅ Clone succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
+                failure {
+                    slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                        message: "❌ Clone failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
+            }
         }
 
         stage('Build') {
             steps {
                 sh 'sudo docker build -t sonalisnehi/pyproject1 -f Dockerfile .'
+            }
+            post {
+                success {
+                    slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                        message: "✅ Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
+                failure {
+                    slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                        message: "❌ Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
             }
         }
 
@@ -25,6 +45,16 @@ pipeline {
                         echo $password | docker login -u $username --password-stdin
                         docker push sonalisnehi/pyproject1
                     '''
+                }
+            }
+            post {
+                success {
+                    slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                        message: "📦 Docker push succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
+                failure {
+                    slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                        message: "❌ Docker push failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -39,6 +69,16 @@ pipeline {
                     sudo rm -rf /opt/sonar-scanner
                     sudo mv --force sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
                 '''
+            }
+            post {
+                success {
+                    slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                        message: "🔧 SonarQube CLI installed successfully")
+                }
+                failure {
+                    slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                        message: "❌ SonarQube CLI installation failed")
+                }
             }
         }
 
@@ -57,41 +97,84 @@ pipeline {
                     '''
                 }
             }
-        }
-
-
-
-stage('install trivy') {
-            steps {
-               sh '''sudo apt-get install wget gnupg
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-sudo apt-get update
-sudo apt-get install trivy'''
+            post {
+                always {
+                    slackSend(channel: '#cicd-alerts', color: '#439FE0',
+                        message: "📊 Sonar analysis completed for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
             }
         }
 
-stage('trivy scan') {
+        stage('Install Trivy') {
             steps {
-               sh '''trivy image sonalisnehi/pyproject1'''
+                sh '''
+                    sudo apt-get install wget gnupg -y
+                    wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+                    echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+                    sudo apt-get update
+                    sudo apt-get install trivy -y
+                '''
+            }
+            post {
+                success {
+                    slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                        message: "🔧 Trivy installed successfully")
+                }
+                failure {
+                    slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                        message: "❌ Trivy installation failed")
+                }
             }
         }
 
-
-stage(' see dashboard scan') {
+        stage('Trivy Scan') {
             steps {
-            sh ' trivy image --format json --output result.json --severity HIGH,CRITICAL sonalisnehi/pyproject1'
-				archiveArtifacts artifacts: 'result.json', followSymlinks: false
+                sh 'trivy image sonalisnehi/pyproject1'
+            }
+            post {
+                always {
+                    slackSend(channel: '#cicd-alerts', color: '#FFA500',
+                        message: "🔒 Trivy scan finished for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
             }
         }
 
-
-stage('Mailing') {
+        stage('Dashboard Scan') {
             steps {
-               mail bcc: '', body: 'Echo status', cc: '', from: 'sonali.friendly@gmail.com', replyTo: '', subject: 'Echo JobStatus of Trivy by jenkins', to: 'sonali.friendly@gmail.com'
+                sh 'trivy image --format json --output result.json --severity HIGH,CRITICAL sonalisnehi/pyproject1'
+                archiveArtifacts artifacts: 'result.json', followSymlinks: false
+            }
+            post {
+                always {
+                    slackSend(channel: '#cicd-alerts', color: '#439FE0',
+                        message: "📊 Dashboard scan results archived for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Mailing') {
+            steps {
+                mail bcc: '', body: 'Echo status', cc: '', from: 'sonali.friendly@gmail.com',
+                     replyTo: '', subject: 'Echo JobStatus of Trivy by Jenkins',
+                     to: 'sonali.friendly@gmail.com'
+            }
+            post {
+                always {
+                    slackSend(channel: '#cicd-alerts', color: '#439FE0',
+                        message: "📧 Email notification sent for ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+                }
             }
         }
     }
+
+    post {
+        success {
+            slackSend(channel: '#cicd-alerts', color: '#36a64f',
+                message: "🎉 Pipeline SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+        }
+        failure {
+            slackSend(channel: '#cicd-alerts', color: '#FF0000',
+                message: "🚨 Pipeline FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+        }
+    }
 }
-
-
