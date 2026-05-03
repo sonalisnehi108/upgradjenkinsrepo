@@ -27,5 +27,25 @@ stage('build') {
         }
 
 
+
+        stage('Install SonarQube CLI') {
+            steps {
+                sh '''
+                    sudo apt update -y
+                    sudo apt install unzip wget -y
+                    wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+                    unzip -o -q sonar-scanner.zip
+                    sudo rm -rf /opt/sonar-scanner
+                    sudo mv --force sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
+                    echo "export PATH=$PATH:/opt/sonar-scanner/bin" | sudo tee /etc/profile.d/sonar-scanner.sh
+                    source /etc/profile.d/sonar-scanner.sh
+                '''
+            }
+        }
+
+
+
+
+
     }
 }
