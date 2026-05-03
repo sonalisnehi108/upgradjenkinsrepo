@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('clone') {
             steps {
-               git 'https://github.com/amitopenwriteup/cicdproject.git'
+               git 'https://github.com/sonalisnehi108/cicdproject.git'
             }
         }
 
